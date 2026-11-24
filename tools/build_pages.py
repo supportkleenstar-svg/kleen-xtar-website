@@ -821,7 +821,17 @@ def build_privacy():
                "How Kleen Xtar collects and uses personal data for doorstep car cleaning in Bengaluru.", S)
 
 
+def sync_css():
+    """Copy the homepage's inline <style> to assets/kx.css so inner pages always match it."""
+    with open(os.path.join(SITE_DIR, "index.html"), encoding="utf-8") as f:
+        css = re.search(r"<style>(.*?)</style>", f.read(), re.S).group(1)
+    with open(os.path.join(SITE_DIR, "assets", "kx.css"), "w", encoding="utf-8") as f:
+        f.write(css.strip() + "\n")
+    print("synced test/assets/kx.css from the homepage")
+
+
 if __name__ == "__main__":
+    sync_css()
     build_blog_index()
     for i, p in enumerate(POSTS):
         build_post(p, i)
