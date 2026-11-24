@@ -21,6 +21,7 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE = "/test"                      # URL prefix of the site
 SITE_DIR = os.path.join(REPO, "test")
 NOINDEX = True                      # test pages stay out of Google
+HOME = "/v2/"                       # which homepage design inner pages link to and take styles from ("/" for the main one)
 
 PHONE_HREF = "tel:+916363287727"
 PHONE_TEXT = "+91 63632 87727"
@@ -38,6 +39,9 @@ SOON_AREAS = ["Rajarajeshwari Nagar", "Kanakapura Road", "Devanahalli", "Hoskote
 
 
 def u(path=""):
+    """Site URL. Homepage links ("/" and "/#section") go to the chosen HOME design."""
+    if path == "/" or path.startswith("/#"):
+        return BASE + HOME.rstrip("/") + path
     return BASE + path
 
 
@@ -85,7 +89,7 @@ def head(title, desc, extra=""):
 {robots}<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{esc(title)}</title>
 <meta name="description" content="{esc(desc)}">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#0B1F44">
 <meta property="og:title" content="{esc(title)}">
 <meta property="og:description" content="{esc(desc)}">
 <meta property="og:type" content="website">
@@ -539,7 +543,7 @@ def build_post(p, i):
 <section class="kx-page">
   <div class="kx-wrap kx-art">
     <article class="kx-prose">
-      <p class="kx-lead" style="color:#C9D5E6;max-width:none">{esc(p['desc'])}</p>
+      <p class="kx-lead kx-intro">{esc(p['desc'])}</p>
 {p['body']}
     </article>
     <aside class="kx-side" aria-label="Book a clean">
@@ -614,9 +618,9 @@ def build_about():
     <aside class="kx-side">
       <div class="kx-card">
         <h2>Who we clean for</h2>
-        <p><b style="color:#fff">Independent houses</b>: porch or street parking, no doorbell, no puddle.</p>
-        <p><b style="color:#fff">Villa communities</b>: every car in the driveway in one visit, with household pricing.</p>
-        <p><b style="color:#fff">Apartment societies</b>: a dedicated crew in your basement, with your association’s approval.</p>
+        <p><b>Independent houses</b>: porch or street parking, no doorbell, no puddle.</p>
+        <p><b>Villa communities</b>: every car in the driveway in one visit, with household pricing.</p>
+        <p><b>Apartment societies</b>: a dedicated crew in your basement, with your association’s approval.</p>
         <a class="kx-btn kx-btn--line-light" href="{u('/#kx-who')}">See how it works for you</a>
       </div>
     </aside>
@@ -766,7 +770,7 @@ def legal_page(slug, title, lead, desc, sections):
   <div class="kx-wrap kx-art">
     <div class="kx-prose">
       {DRAFT}
-      <p><b style="color:#fff">Last updated:</b> {fmt_date(PUBLISHED)}</p>
+      <p><b>Last updated:</b> {fmt_date(PUBLISHED)}</p>
 {body}
     </div>
     <aside class="kx-side" aria-label="On this page">
@@ -822,12 +826,12 @@ def build_privacy():
 
 
 def sync_css():
-    """Copy the homepage's inline <style> to assets/kx.css so inner pages always match it."""
-    with open(os.path.join(SITE_DIR, "index.html"), encoding="utf-8") as f:
+    """Copy the HOME design's inline <style> to assets/kx.css so inner pages always match it."""
+    with open(os.path.join(SITE_DIR, HOME.strip("/"), "index.html"), encoding="utf-8") as f:
         css = re.search(r"<style>(.*?)</style>", f.read(), re.S).group(1)
     with open(os.path.join(SITE_DIR, "assets", "kx.css"), "w", encoding="utf-8") as f:
         f.write(css.strip() + "\n")
-    print("synced test/assets/kx.css from the homepage")
+    print("synced test/assets/kx.css from " + BASE + HOME)
 
 
 if __name__ == "__main__":
